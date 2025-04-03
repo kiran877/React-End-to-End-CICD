@@ -22,27 +22,24 @@ pipeline {
       }
     }
 
-
-    stage('Static Code Analysis') {
-      environment {
-        SONAR_URL = "http://54.221.145.141:9000/"
-      }
-
-     steps {
-    withCredentials([string(credentialsId: 'sonarqube', variable: 'SONAR_AUTH_TOKEN')]) {
-      sh '''
-        cd React-sonar-argocd/react-firebase-app
-        sonar-scanner \
-          -Dsonar.projectKey=React-Firebase-App \
-          -Dsonar.sources=src \
-          -Dsonar.host.url=${SONAR_URL} \
-          -Dsonar.login=${SONAR_AUTH_TOKEN} \
-          -Dsonar.language=js \
-          -Dsonar.sourceEncoding=UTF-8
-      '''
+stage('Static Code Analysis') {
+    environment {
+        SONAR_URL = "http://54.221.145.141:9000"
     }
-  }
- }
+    steps {
+        withSonarQubeEnv('SonarQube-EC2') {
+            sh '''
+                cd React-sonar-argocd/react-firebase-app
+                sonar-scanner -Dsonar.projectKey=React-Firebase-App \
+                              -Dsonar.sources=src \
+                              -Dsonar.language=js \
+                              -Dsonar.sourceEncoding=UTF-8
+            '''
+        }
+    }
+}
+
+   
     stage('Build and Push Docker Image') {
       environment {
         DOCKER_IMAGE = "saikiran078/react-firebase-cicd:${BUILD_NUMBER}" 
