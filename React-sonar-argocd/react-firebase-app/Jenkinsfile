@@ -14,7 +14,7 @@ pipeline {
     stages {
         stage('Checkout') {
             steps {
-                git branch: 'main', url: 'https://github.com/kiran877/react-firebase-cicd.git'
+                sh 'echo passed'
             }
         }
 
