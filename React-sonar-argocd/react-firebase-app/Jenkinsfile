@@ -1,141 +1,84 @@
 pipeline {
-  agent any {
-    tools {
-     nodejs 'Node18'// Using Node.js for building React app
-      args '--user root -v /var/run/docker.sock:/var/run/docker.sock'
-    }
-  }
-  
-  stages {
-    stage('Checkout') {
-      steps {
-        sh 'echo passed'
-        // git branch: 'main', url: 'https://github.com/kiran877/react-firebase-cicd.git'
-      }
-    }
+    agent any  
 
-
-    stage('Install Dependencies & Build React App') {
-      steps {
-        sh 'ls -ltr'
-        sh 'cd React-sonar-argocd/react-firebase-app && npm install && npm run build'
-      }
-    }
-
-stage('Static Code Analysis') {
     environment {
+        NODEJS_HOME = tool name: 'Node18', type: 'nodejs'
+        PATH = "${NODEJS_HOME}/bin:${env.PATH}"
         SONAR_URL = "http://54.221.145.141:9000"
-    }
-    steps {
-        withSonarQubeEnv('SonarQube-EC2') {
-            sh '''
-        cd React-sonar-argocd/react-firebase-app
-        npm install
-        npm run sonar -- -Dsonar.login=$SONAR_AUTH_TOKEN -Dsonar.host.url=${SONAR_URL}
-        '''
-        }
-    }
-}
-
-   
-    stage('Build and Push Docker Image') {
-      environment {
-        DOCKER_IMAGE = "saikiran078/react-firebase-cicd:${BUILD_NUMBER}" 
+        DOCKER_IMAGE = "saikiran078/react-firebase-cicd:${BUILD_NUMBER}"
         REGISTRY_CREDENTIALS = credentials('docker-cred')
-      }
-      steps {
-        script {
-            sh 'cd React-sonar-argocd/react-firebase-app && docker build -t ${DOCKER_IMAGE} .'
-            def dockerImage = docker.image("${DOCKER_IMAGE}")
-            docker.withRegistry('https://index.docker.io/v1/', "docker-cred") {
-                dockerImage.push()
+        GIT_REPO_NAME = "React-End-to-End-CICD"
+        GIT_USER_NAME = "kiran877"
+    }
+
+    stages {
+        stage('Checkout') {
+            steps {
+                git branch: 'main', url: 'https://github.com/kiran877/react-firebase-cicd.git'
             }
         }
-      }
-    }
-    stage('Update Deployment File') {
-      environment {
-  
-    GIT_REPO_NAME = "React-End-to-End-CICD"
-    GIT_USER_NAME = "kiran877"
-  }
-        steps {
-            withCredentials([string(credentialsId: 'github', variable: 'GITHUB_TOKEN')]) {
+
+        stage('Install Dependencies & Build React App') {
+            steps {
                 sh '''
-                    git config user.email "kirangavvala078@gmail.com"
-                    git config user.name "kiran877"
-                    sed -i "s/replaceImageTag/${BUILD_NUMBER}/g" React-sonar-argocd/react-firebase-app-manifest/deployment.yml
-                    git add React-sonar-argocd/react-firebase-app-manifest/deployment.yml
-                    git commit -m "Update deployment image to version ${BUILD_NUMBER}"
-                    git push https://${GITHUB_TOKEN}@github.com/${GIT_USER_NAME}/${GIT_REPO_NAME} HEAD:main
+                    cd React-sonar-argocd/react-firebase-app
+                    npm install
+                    npm run build
                 '''
             }
         }
+
+        stage('Static Code Analysis') {
+            steps {
+                withSonarQubeEnv('SonarQube-EC2') {
+                    sh '''
+                        cd React-sonar-argocd/react-firebase-app
+                        npm run sonar -- -Dsonar.login=$SONAR_AUTH_TOKEN -Dsonar.host.url=${SONAR_URL}
+                    '''
+                }
+            }
+        }
+
+        stage('Build and Push Docker Image') {
+            steps {
+                script {
+                    sh '''
+                        cd React-sonar-argocd/react-firebase-app
+                        docker build -t ${DOCKER_IMAGE} .
+                    '''
+                    docker.withRegistry('https://index.docker.io/v1/', "docker-cred") {
+                        docker.image("${DOCKER_IMAGE}").push()
+                    }
+                }
+            }
+        }
+
+        stage('Update Deployment File') {
+            steps {
+                withCredentials([string(credentialsId: 'github', variable: 'GITHUB_TOKEN')]) {
+                    sh '''
+                        git config --global user.email "kirangavvala078@gmail.com"
+                        git config --global user.name "kiran877"
+                        sed -i "s|replaceImageTag|${BUILD_NUMBER}|g" React-sonar-argocd/react-firebase-app-manifest/deployment.yml
+                        git add React-sonar-argocd/react-firebase-app-manifest/deployment.yml
+                        git commit -m "Update deployment image to version ${BUILD_NUMBER}"
+                        git push https://${GITHUB_TOKEN}@github.com/${GIT_USER_NAME}/${GIT_REPO_NAME} HEAD:main
+                    '''
+                }
+            }
+        }
     }
-  }
+
+    post {
+        always {
+            echo 'Cleaning up workspace...'
+            cleanWs()
+        }
+        success {
+            echo 'Build and deployment successful!'
+        }
+        failure {
+            echo 'Build or deployment failed. Check logs for details.'
+        }
+    }
 }
-
-
-
-
-// pipeline {
-//     agent any
-
-//     environment {
-//         DOCKERHUB_CREDENTIALS = credentials('dockerhub-credentials')
-//         IMAGE_NAME = 'saikiran078/frontend'
-//         // Firebase credentials as Jenkins secrets
-//         REACT_APP_FIREBASE_API_KEY = credentials('firebase-api-key')
-//         REACT_APP_FIREBASE_AUTH_DOMAIN = credentials('firebase-auth-domain')
-//         REACT_APP_FIREBASE_PROJECT_ID = credentials('firebase-project-id')
-//         REACT_APP_FIREBASE_STORAGE_BUCKET = credentials('firebase-storage-bucket')
-//         REACT_APP_FIREBASE_MESSAGING_SENDER_ID = credentials('firebase-messaging-sender-id')
-//         REACT_APP_FIREBASE_APP_ID = credentials('firebase-app-id')
-//         REACT_APP_FIREBASE_MEASUREMENT_ID = credentials('firebase-measurement-id')
-//     }
-
-//     stages {
-//         stage('Checkout Code') {
-//             steps {
-//                 checkout scm
-//             }
-//         }
-
-//         stage('Build Docker Image') {
-//             steps {
-//                 script {
-//                     docker.build("${IMAGE_NAME}:${env.BUILD_NUMBER}", 
-//                     "--build-arg REACT_APP_FIREBASE_API_KEY=${REACT_APP_FIREBASE_API_KEY} --build-arg REACT_APP_FIREBASE_AUTH_DOMAIN=${REACT_APP_FIREBASE_AUTH_DOMAIN} --build-arg REACT_APP_FIREBASE_PROJECT_ID=${REACT_APP_FIREBASE_PROJECT_ID} --build-arg REACT_APP_FIREBASE_STORAGE_BUCKET=${REACT_APP_FIREBASE_STORAGE_BUCKET} --build-arg REACT_APP_FIREBASE_MESSAGING_SENDER_ID=${REACT_APP_FIREBASE_MESSAGING_SENDER_ID} --build-arg REACT_APP_FIREBASE_APP_ID=${REACT_APP_FIREBASE_APP_ID} --build-arg REACT_APP_FIREBASE_MEASUREMENT_ID=${REACT_APP_FIREBASE_MEASUREMENT_ID} .")
-//                 }
-//             }
-//         }
-
-//         stage('Push to Docker Hub') {
-//             steps {
-//                 script {
-//                     docker.withRegistry('https://index.docker.io/v1/', DOCKERHUB_CREDENTIALS) {
-//                         docker.image("${IMAGE_NAME}:${env.BUILD_NUMBER}").push()
-//                     }
-//                 }
-//             }
-//         }
-
-//         stage('Deploy') {
-//             steps {
-//                 echo 'Deployment stage - Here, you can add your deployment scripts or commands'
-//             }
-//         }
-//     }
-
-//     post {
-//         always {
-//             cleanWs()
-//         }
-//         success {
-//             echo 'Build and deployment successful!'
-//         }
-//         failure {
-//             echo 'Build or deployment failed. Check logs for details.'
-//         }
-//     }
-// }
