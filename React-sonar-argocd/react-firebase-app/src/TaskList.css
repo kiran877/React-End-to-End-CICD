@@ -1,0 +1,248 @@
+/* Desktop Styles */
+.TaskList { 
+  display: flex; 
+  justify-content: center; 
+  padding: 20px; 
+}
+
+.TaskList-container { 
+  display: flex; 
+  justify-content: space-between; 
+  width: 100%; 
+  max-width: 1200px; 
+  gap: 20px; 
+  padding: 20px 0; 
+}
+
+.TaskList-column { 
+  width: 320px; 
+  height: auto; 
+  border-radius: 10px; 
+  box-shadow: 0 0 10px rgba(0, 0, 0, 0.1); 
+  overflow: hidden; 
+  background: white; 
+}
+
+.TaskList-column h2 { 
+  margin-top: 0; 
+  padding: 10px; 
+  color: white; 
+  border-top-left-radius: 12px; 
+  border-top-right-radius: 12px; 
+  font-size: 1.2em; 
+  text-align: center; 
+}
+
+.TaskList-column.todo h2 { 
+  background-color: #8A31E5; 
+}
+
+.TaskList-column.inprogress h2 { 
+  background-color: #FFC04E; 
+}
+
+.TaskList-column.completed h2 { 
+  background-color: #06C270; 
+}
+
+.TaskList-item { 
+  margin-left: 20px; 
+  margin-right: 20px; 
+  margin-bottom: 15px; 
+  padding: 10px; 
+  border: 2px solid #eee; 
+  border-radius: 10px; 
+  background: #fff; 
+  overflow: hidden; 
+  position: relative; 
+}
+
+.TaskList-item::before { 
+  content: ''; 
+  position: absolute; 
+  top: 50%; 
+  left: 0; 
+  width: 4px; 
+  height: 38%; 
+  transform: translateY(-50%); 
+  border-radius: 2px; 
+}
+
+.TaskList-item.todo::before { 
+  background: #8A30E5; 
+}
+
+.TaskList-item.inprogress::before { 
+  background: #FFC04E; 
+}
+
+.TaskList-item.completed::before { 
+  background: #06C270; 
+}
+
+.TaskList-priority { 
+  display: inline-block; 
+  font-weight: bold; 
+  font-size: 0.8em; 
+  margin-left: 5px; 
+  margin-bottom: 5px; 
+  padding: 4px; 
+  border-radius: 4px; 
+  color: white; 
+  width: fit-content; 
+}
+
+.TaskList-priority.low { 
+  background-color: #f0ffdd; 
+  color: #9da09a; 
+}
+
+.TaskList-priority.medium { 
+  background-color: #ffece1; 
+  color: #ff43c3; 
+}
+
+.TaskList-priority.high { 
+  background-color: #ffece1; 
+  color: #ff9b62; 
+}
+
+.TaskList-content { 
+  display: flex; 
+  flex-direction: column; 
+  height: calc(100% - 40px); 
+}
+
+.TaskList-title-description { 
+  flex: 1; 
+  overflow: hidden; 
+  margin-bottom: 5px; 
+  margin-left: 5px; 
+  max-width: 100%; 
+}
+
+.TaskList-title-description h3 { 
+  margin: 0; 
+  font-size: 1.1em; 
+  overflow: hidden; 
+  text-overflow: ellipsis; 
+  white-space: nowrap; 
+  max-width: 100%; 
+}
+
+.TaskList-title-description p { 
+  margin: 0; 
+  overflow: hidden; 
+  text-overflow: ellipsis; 
+  white-space: normal; 
+  font-family: 'Inter', sans-serif; 
+  font-size: 12px; 
+  font-weight: 400; 
+  line-height: 14.52px; 
+  text-align: left; 
+  display: -webkit-box; 
+  -webkit-line-clamp: 3; 
+  -webkit-box-orient: vertical; 
+  max-width: 100%; 
+  color: #787486; 
+}
+
+.TaskList-date { 
+  display: flex; 
+  align-items: center; 
+  margin-top: 10px; 
+  font-size: 0.9em; 
+  padding-top: 10px; 
+  border-top: 2px solid #ddd; 
+}
+
+.TaskList-calendar-icon { 
+  width: 25px; 
+  height: 26px; 
+}
+
+.TaskList-title { 
+  display: flex; 
+  align-items: center; 
+  justify-content: space-between; 
+}
+
+.TaskList-title h3 { 
+  margin: 0; 
+  font-size: 1.1em; 
+  white-space: nowrap; 
+}
+
+.MuiMenu-paper { 
+  border-radius: 4px; 
+  border: 1px solid #ddd; 
+}
+
+.MuiMenuItem-root { 
+  padding: 10px 20px; 
+  font-size: 0.9em; 
+}
+
+.ChangeStatusMenuItem { 
+  border-top: 1px solid #ddd; 
+  font-weight: bold; 
+}
+
+.MuiMenuItem-root + .MuiMenuItem-root { 
+  border-top: 1px solid #ddd; 
+  margin-top: -1px; 
+}
+
+/* Mobile View Styles */
+@media (max-width: 768px) { 
+  .TaskList { 
+    flex-direction: column; 
+    align-items: center; 
+    padding: 10px; 
+  } 
+  
+  .TaskList-container { 
+    flex-direction: column; 
+    gap: 10px; 
+    padding: 10px 0; 
+    max-width: 100%; 
+  } 
+  
+  .TaskList-column { 
+    width: 100%; 
+    margin-bottom: 20px; 
+  } 
+  
+  .TaskList-column h2 { 
+    font-size: 1em; 
+    padding: 8px; 
+  } 
+  
+  .TaskList-item { 
+    margin-left: 10px; 
+    margin-right: 10px; 
+    padding: 8px; 
+  } 
+  
+  .TaskList-item::before { 
+    height: 30%; 
+  } 
+  
+  .TaskList-title-description h3 { 
+    font-size: 1em; 
+  } 
+  
+  .TaskList-title-description p { 
+    font-size: 11px; 
+    line-height: 13px; 
+  } 
+  
+  .TaskList-date { 
+    font-size: 0.8em; 
+  } 
+  
+  .TaskList-calendar-icon { 
+    width: 20px; 
+    height: 21px; 
+  } 
+}
