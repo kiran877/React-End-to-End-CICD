@@ -1,5 +1,5 @@
 pipeline {
-  agent {
+  agent any {
     tools {
      nodejs 'Node18'// Using Node.js for building React app
       args '--user root -v /var/run/docker.sock:/var/run/docker.sock'
