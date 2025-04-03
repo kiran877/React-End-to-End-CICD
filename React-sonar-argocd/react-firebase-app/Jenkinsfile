@@ -28,16 +28,21 @@ pipeline {
             }
         }
 
-        stage('Static Code Analysis') {
-            steps {
-                withSonarQubeEnv('SonarQube-EC2') {
-                    sh '''
-                        cd React-sonar-argocd/react-firebase-app
-                        npm run sonar -- -Dsonar.login=$SONAR_AUTH_TOKEN -Dsonar.host.url=${SONAR_URL}
-                    '''
-                }
-            }
+       stage('Static Code Analysis') {
+    environment {
+        SONAR_URL = "http://54.221.145.141:9000" // Ensure this is the correct SonarQube URL
+    }
+    steps {
+        withCredentials([string(credentialsId: 'sonarqube', variable: 'SONAR_AUTH_TOKEN')]) {
+            sh '''
+                cd React-sonar-argocd/react-firebase-app
+                npm install
+                npm run sonar -- -Dsonar.login=$SONAR_AUTH_TOKEN -Dsonar.host.url=${SONAR_URL}
+            '''
         }
+    }
+}
+
 
         stage('Build and Push Docker Image') {
             steps {
