@@ -29,12 +29,10 @@ stage('Static Code Analysis') {
     steps {
         withSonarQubeEnv('SonarQube-EC2') {
             sh '''
-                cd React-sonar-argocd/react-firebase-app
-                sonar-scanner -Dsonar.projectKey=React-Firebase-App \
-                              -Dsonar.sources=src \
-                              -Dsonar.language=js \
-                              -Dsonar.sourceEncoding=UTF-8
-            '''
+        cd React-sonar-argocd/react-firebase-app
+        npm install
+        npm run sonar -- -Dsonar.login=$SONAR_AUTH_TOKEN -Dsonar.host.url=${SONAR_URL}
+        '''
         }
     }
 }
