@@ -16,6 +16,6 @@ spec:
     spec:
       containers:
       - name: react-firebase-app
-        image: saikiran078/react-firebase-cicd:replaceImageTag
+        image: saikiran078/react-firebase-cicd:12
         ports:
         - containerPort: 80
