@@ -21,7 +21,7 @@ function App() {
       </header>
 
       <div className="New-container">
-        <p className="New-container-text">Desktop & Mobile Application</p>
+        <p className="New-container-text">Desktop</p>
         <button className="New-container-button" onClick={handleOpenNewTask}>Create Task</button>
       </div>
 
